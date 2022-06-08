@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -62,30 +64,30 @@ namespace FLT_dir2webp_cs
         {
             if (IMG_FILES != null)
             {
-                int progMax = IMG_FILES.Count;
-                int progCur = 0;
-
-                foreach (string file in IMG_FILES)
+                Parallel.ForEach(IMG_FILES,
+                    new ParallelOptions
+                    {
+                        MaxDegreeOfParallelism = Convert.ToInt32(Math.Ceiling(Environment.ProcessorCount * 0.75 * 2.0))
+                    },
+                    file =>
                 {
                     string dirname = System.IO.Path.GetDirectoryName(file);
                     string filename = System.IO.Path.GetFileNameWithoutExtension(file);
+                    string path = dirname + '\\' + filename + ".webp";
 
                     MagickImageCollection mi = new MagickImageCollection(file);
-                    
+
                     foreach (MagickImage frame in mi)
                     {
                         frame.Quality = 90;
                         frame.Settings.SetDefine(MagickFormat.WebP, "lossless", "false");
                     }
 
-                    Task task = mi.WriteAsync(dirname + '\\' + filename + ".webp", MagickFormat.WebP);
-                    task.ContinueWith(t =>
-                    {
-                        mi.Dispose();
-                    });
+                    mi.Write(path, MagickFormat.WebP);
+                    mi.Dispose();
+                });
 
-                    this.Title = (++progCur).ToString() + "/" + progMax.ToString();
-                }
+                this.Title = "Complete";
             }
         }
     }
