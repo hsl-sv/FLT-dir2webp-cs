@@ -1,18 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Windows.Forms;
 
 using ImageMagick;
 
@@ -23,6 +14,10 @@ namespace FLT_dir2webp_cs
     /// </summary>
     public partial class MainWindow : Window
     {
+        public readonly string[] EXT_AVAIL = { ".jpg", ".jpeg", ".png", ".gif",
+        ".apng", ".bmp", ".dds", ".jfif", ".pcx", ".svg", ".tiff", ".tif", ".tga"};
+        public static List<string> IMG_FILES;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -32,31 +27,66 @@ namespace FLT_dir2webp_cs
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            //string filepath = Directory.GetCurrentDirectory();
-            //filepath = "C:\\Users\\skycr\\OneDrive\\Documents\\Codes\\FLT-dir2webp-cs\\FLT-dir2webp-cs\\test\\";
 
-            //ConvertToWebp(filepath);
-        }
-
-        private void ConvertToWebp(string path)
-        {
-            string[] fList = Directory.GetFiles(path);
-
-            foreach (string file in fList)
-            {
-                string ext = System.IO.Path.GetExtension(file);
-                string dirname = System.IO.Path.GetDirectoryName(file);
-                string filename = System.IO.Path.GetFileNameWithoutExtension(file);
-
-                MagickImageCollection mi = new MagickImageCollection(file);
-                mi.Write(dirname + '\\' + filename + ".webp", MagickFormat.WebP);
-                mi.Dispose();
-            }
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            using (var fbd = new FolderBrowserDialog())
+            {
+                DialogResult result = fbd.ShowDialog();
 
+                if (result == System.Windows.Forms.DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                {
+                    tbxPath.Text = fbd.SelectedPath;
+
+                    List<string> imgFiles = new List<string>();
+                    string[] fList = Directory.GetFiles(fbd.SelectedPath, "*.*", SearchOption.AllDirectories);
+
+                    foreach (string file in fList)
+                    {
+                        if (EXT_AVAIL.Any(f => f == System.IO.Path.GetExtension(file.ToLower())))
+                        {
+                            imgFiles.Add(file);
+                        }
+                    }
+
+                    this.Title = "Files count : " + imgFiles.Count.ToString();
+
+                    IMG_FILES = imgFiles;
+                }
+            }
+        }
+
+        private void Run_Click(object sender, RoutedEventArgs e)
+        {
+            if (IMG_FILES != null)
+            {
+                int progMax = IMG_FILES.Count;
+                int progCur = 0;
+
+                foreach (string file in IMG_FILES)
+                {
+                    string dirname = System.IO.Path.GetDirectoryName(file);
+                    string filename = System.IO.Path.GetFileNameWithoutExtension(file);
+
+                    MagickImageCollection mi = new MagickImageCollection(file);
+                    
+                    foreach (MagickImage frame in mi)
+                    {
+                        frame.Quality = 90;
+                        frame.Settings.SetDefine(MagickFormat.WebP, "lossless", "false");
+                    }
+
+                    Task task = mi.WriteAsync(dirname + '\\' + filename + ".webp", MagickFormat.WebP);
+                    task.ContinueWith(t =>
+                    {
+                        mi.Dispose();
+                    });
+
+                    this.Title = (++progCur).ToString() + "/" + progMax.ToString();
+                }
+            }
         }
     }
 }

@@ -5,15 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FLT_dir2webp_cs"
         mc:Ignorable="d"
-        Title="MainWindow" Height="250" Width="450">
+        Title="FLT-dir2webp-cs" Height="100" Width="450">
     <Grid Margin="0">
         <Grid.RowDefinitions>
-            <RowDefinition Height="48"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
-            <TextBox Margin="62,10,10,10" Text="TextBox" TextWrapping="Wrap" VerticalContentAlignment="Center"/>
+            <TextBox x:Name="tbxPath" Margin="62,10,61,10" Text="..." TextWrapping="Wrap" VerticalContentAlignment="Center" IsEnabled="False" />
             <Button Content="Browse" HorizontalAlignment="Left" Margin="10,10,0,10" Width="47" Click="Button_Click"/>
+            <Button Content="Run" Margin="0,10,10,10" Click="Run_Click" HorizontalAlignment="Right" Width="47" />
         </Grid>
     </Grid>
 </Window>
