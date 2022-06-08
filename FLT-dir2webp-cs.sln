@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32428.217
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FLT-dir2webp-cs", "FLT-dir2webp-cs\FLT-dir2webp-cs.csproj", "{6B4BC84D-1996-4412-B29E-F2098A3EC816}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6B4BC84D-1996-4412-B29E-F2098A3EC816}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B4BC84D-1996-4412-B29E-F2098A3EC816}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B4BC84D-1996-4412-B29E-F2098A3EC816}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B4BC84D-1996-4412-B29E-F2098A3EC816}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5EFB41A5-A42D-4507-BE62-B8895120C192}
+	EndGlobalSection
+EndGlobal
