@@ -75,16 +75,25 @@ namespace FLT_dir2webp_cs
                     string filename = System.IO.Path.GetFileNameWithoutExtension(file);
                     string path = dirname + '\\' + filename + ".webp";
 
-                    MagickImageCollection mi = new MagickImageCollection(file);
-
-                    foreach (MagickImage frame in mi)
+                    try
                     {
-                        frame.Quality = 90;
-                        frame.Settings.SetDefine(MagickFormat.WebP, "lossless", "false");
-                    }
+                        MagickImageCollection mi = new MagickImageCollection(file);
 
-                    mi.Write(path, MagickFormat.WebP);
-                    mi.Dispose();
+                        foreach (MagickImage frame in mi)
+                        {
+                            frame.Quality = 90;
+                            frame.Settings.SetDefine(MagickFormat.WebP, "lossless", "false");
+                        }
+
+                        mi.Write(path, MagickFormat.WebP);
+                        mi.Dispose();
+                    }
+                    catch(Exception e)
+                    {
+                        // Exceed height or width problem
+
+                        // Do nothing atm
+                    }
                 });
 
                 this.Title = "Complete";
