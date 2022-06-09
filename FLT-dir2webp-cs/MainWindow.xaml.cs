@@ -64,6 +64,9 @@ namespace FLT_dir2webp_cs
         {
             if (IMG_FILES != null)
             {
+                string STRING_ERR = ", Error : ";
+                int INT_ERR = 0;
+
                 Parallel.ForEach(IMG_FILES,
                     new ParallelOptions
                     {
@@ -74,6 +77,7 @@ namespace FLT_dir2webp_cs
                     string dirname = System.IO.Path.GetDirectoryName(file);
                     string filename = System.IO.Path.GetFileNameWithoutExtension(file);
                     string path = dirname + '\\' + filename + ".webp";
+                    string errpath = dirname + '\\' + "__Error_log.txt";
 
                     try
                     {
@@ -81,7 +85,12 @@ namespace FLT_dir2webp_cs
 
                         foreach (MagickImage frame in mi)
                         {
-                            frame.Quality = 90;
+                            while (frame.Height > 2160 || frame.Width > 3840)
+                            {
+                                frame.Resize(new Percentage(80));
+                            }
+
+                            frame.Quality = 80;
                             frame.Settings.SetDefine(MagickFormat.WebP, "lossless", "false");
                         }
 
@@ -90,13 +99,13 @@ namespace FLT_dir2webp_cs
                     }
                     catch(Exception e)
                     {
-                        // Exceed height or width problem
-
-                        // Do nothing atm
+                        Debug.WriteLine(e.ToString());
+                        INT_ERR++;
+                        System.IO.File.AppendAllTextAsync(errpath, file + Environment.NewLine);
                     }
                 });
 
-                this.Title = "Complete";
+                this.Title = "Complete" + STRING_ERR + INT_ERR.ToString();
             }
         }
     }
