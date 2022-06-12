@@ -70,7 +70,7 @@ namespace FLT_dir2webp_cs
                 Parallel.ForEach(IMG_FILES,
                     new ParallelOptions
                     {
-                        MaxDegreeOfParallelism = Convert.ToInt32(Math.Ceiling(Environment.ProcessorCount * 0.75 * 2.0))
+                        MaxDegreeOfParallelism = Convert.ToInt32(Math.Ceiling(Environment.ProcessorCount * 0.7))
                     },
                     file =>
                 {
