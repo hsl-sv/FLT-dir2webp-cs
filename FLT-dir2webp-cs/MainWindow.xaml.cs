@@ -16,7 +16,7 @@ namespace FLT_dir2webp_cs
     /// </summary>
     public partial class MainWindow : Window
     {
-        public readonly string[] EXT_AVAIL = { ".jpg", ".jpeg", ".png", ".gif",
+        public readonly string[] EXT_AVAIL = { ".jpg", ".jpeg", ".png", ".gif", ".webp",
         ".apng", ".bmp", ".dds", ".jfif", ".pcx", ".svg", ".tiff", ".tif", ".tga"};
         public static List<string> IMG_FILES;
 
@@ -74,10 +74,16 @@ namespace FLT_dir2webp_cs
                     },
                     file =>
                 {
+                    string extname = System.IO.Path.GetExtension(file);
                     string dirname = System.IO.Path.GetDirectoryName(file);
                     string filename = System.IO.Path.GetFileNameWithoutExtension(file);
                     string path = dirname + '\\' + filename + ".webp";
                     string errpath = dirname + '\\' + "__Error_log.txt";
+
+                    if (extname == ".webp")
+                    {
+                        path = dirname + '\\' + "m_" + filename + ".webp";
+                    }
 
                     try
                     {
