@@ -67,13 +67,13 @@ namespace FLT_dir2webp_cs
                 string STRING_ERR = ", Error : ";
                 int INT_ERR = 0;
 
-                Parallel.ForEach(IMG_FILES,
-                    new ParallelOptions
-                    {
-                        MaxDegreeOfParallelism = Convert.ToInt32(Math.Ceiling(Environment.ProcessorCount * 0.7))
-                    },
-                    file =>
-                    //foreach (string file in IMG_FILES)
+                //Parallel.ForEach(IMG_FILES,
+                //    new ParallelOptions
+                //    {
+                //        MaxDegreeOfParallelism = Convert.ToInt32(Math.Ceiling(Environment.ProcessorCount * 0.7))
+                //    },
+                //    file =>
+                foreach (string file in IMG_FILES)
                 {
                     string extname = System.IO.Path.GetExtension(file);
                     string dirname = System.IO.Path.GetDirectoryName(file);
@@ -86,50 +86,56 @@ namespace FLT_dir2webp_cs
                         path = dirname + '\\' + "m_" + filename + ".webp";
                     }
 
-                    try
-                    {
-                        MagickImageCollection mi = new MagickImageCollection(file);
+                    //try
+                    //{
+                    MagickImageCollection mi = new MagickImageCollection(file);
 
-                        // Prevent GIF black dots (disposing problem)
+                    // Skip animated webp
+                    if (mi.Count > 1 && extname == ".webp")
+                    {
+                        continue;
+                    }
+                    // Prevent GIF black dots (disposing problem)
+                    else if (mi.Count > 1)
+                    {
+                        mi.Coalesce();
+                    }
+
+                    foreach (MagickImage frame in mi)
+                    {
+                        while (frame.Height > 2160 || frame.Width > 3840)
+                        {
+                            frame.Resize(new Percentage(75));
+                        }
+
+                        // GIF frame size validation
                         if (extname == ".gif")
                         {
-                            mi.Coalesce();
+                            // force resize to first frame
+                            if (mi[0].Width != frame.Width)
+                            {
+                                MagickGeometry size = new MagickGeometry(mi[0].Width, mi[0].Height);
+                                size.IgnoreAspectRatio = true;
+                                frame.Resize(size);
+                            }
                         }
 
-                        foreach (MagickImage frame in mi)
-                        {
-                            while (frame.Height > 2160 || frame.Width > 3840)
-                            {
-                                frame.Resize(new Percentage(80));
-                            }
-
-                            // GIF frame size validation
-                            if (extname == ".gif")
-                            {
-                                // force resize to first frame
-                                if (mi[0].Width != frame.Width)
-                                {
-                                    MagickGeometry size = new MagickGeometry(mi[0].Width, mi[0].Height);
-                                    size.IgnoreAspectRatio = true;
-                                    frame.Resize(size);
-                                }
-                            }
-
-                            frame.Quality = 80;
-                            frame.Settings.SetDefine(MagickFormat.WebP, "lossless", "false");
-                        }
-
-                        mi.Write(path, MagickFormat.WebP);
-                        mi.Dispose();
-
+                        frame.Quality = 80;
+                        frame.Settings.SetDefine(MagickFormat.WebP, "lossless", "false");
                     }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine(ex.ToString());
-                        INT_ERR++;
-                        System.IO.File.AppendAllTextAsync(errpath, file + Environment.NewLine);
-                    }
-                });
+
+                    mi.Write(path, MagickFormat.WebP);
+                    mi.Dispose();
+
+                    //}
+                    //catch (Exception ex)
+                    //{
+                    //    Debug.WriteLine(ex.ToString());
+                    //    INT_ERR++;
+                    //    System.IO.File.AppendAllTextAsync(errpath, file + Environment.NewLine);
+                    //}
+                    //});
+                }
 
                 this.Title = "Complete" + STRING_ERR + INT_ERR.ToString();
             }
