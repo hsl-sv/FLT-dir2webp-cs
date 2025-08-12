@@ -78,26 +78,20 @@ namespace FLT_dir2webp_cs
                     string extname = System.IO.Path.GetExtension(file);
                     string dirname = System.IO.Path.GetDirectoryName(file);
                     string filename = System.IO.Path.GetFileNameWithoutExtension(file);
-                    string path = dirname + '\\' + filename + ".webp";
+                    string path = dirname + '\\' + filename + ".avif";
                     string errpath = dirname + '\\' + "__Error_log.txt";
 
-                    if (extname == ".webp")
+                    if (extname == ".avif")
                     {
-                        path = dirname + '\\' + "m_" + filename + ".webp";
+                        path = dirname + '\\' + "m_" + filename + ".avif";
                     }
 
                     try
                     {
                         MagickImageCollection mi = new MagickImageCollection(file);
 
-                        // Skip animated webp
-                        if (mi.Count > 1 && extname == ".webp")
-                        {
-                            mi.Dispose();
-                            return; // continue; in Parallel.ForEach
-                        }
                         // Prevent GIF black dots (disposing problem)
-                        else if (mi.Count > 1)
+                        if (mi.Count > 1)
                         {
                             mi.Coalesce();
                         }
@@ -122,10 +116,12 @@ namespace FLT_dir2webp_cs
                             }
 
                             frame.Quality = 80;
-                            frame.Settings.SetDefine(MagickFormat.WebP, "lossless", "false");
+                            frame.Format = MagickFormat.Avif;
+                            frame.Settings.SetDefine(MagickFormat.Avif, "lossless", "false");
+                            frame.Settings.SetDefine(MagickFormat.Avif, "effort", "4");
                         }
 
-                        mi.Write(path, MagickFormat.WebP);
+                        mi.Write(path);
                         mi.Dispose();
 
                     }
